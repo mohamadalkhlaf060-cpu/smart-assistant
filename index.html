@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Assistant</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #101525;
+  color: white;
+  text-align: center;
+}
+
+header {
+  padding: 30px;
+  background: #202b46;
+}
+
+h1 {
+  color: #8b9cff;
+}
+
+.chat {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+#messages {
+  background: #202b46;
+  padding: 20px;
+  min-height: 250px;
+  border-radius: 15px;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+input {
+  width: 70%;
+  padding: 14px;
+  margin-top: 15px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  padding: 14px 20px;
+  background: #657cff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🤖 Smart Assistant</h1>
+<p>مساعدك الشخصي الذكي</p>
+</header>
+
+<div class="chat">
+
+<div id="messages">
+<p>مرحباً! أنا مساعدك الذكي ❤️</p>
+</div>
+
+<input
+id="userInput"
+placeholder="اكتب رسالتك هنا..."
+>
+
+<button onclick="sendMessage()">إرسال</button>
+
+</div>
+
+<script>
+
+function sendMessage() {
+
+  let input = document.getElementById("userInput");
+  let messages = document.getElementById("messages");
+
+  let text = input.value.trim();
+
+  if (!text) return;
+
+  let userMessage = document.createElement("p");
+  userMessage.textContent = "أنت: " + text;
+  messages.appendChild(userMessage);
+
+  let reply = "أهلاً بك! كيف أستطيع مساعدتك؟";
+
+  if (text.includes("مرحبا") || text.includes("السلام")) {
+    reply = "أهلاً وسهلاً بك ❤️";
+
+  } else if (text.includes("كيف حالك")) {
+    reply = "أنا بخير، شكراً لسؤالك!";
+
+  } else if (text.includes("اسمك")) {
+    reply = "أنا Smart Assistant 🤖";
+
+  } else if (text.includes("بايثون")) {
+    reply = "Python لغة رائعة للبرمجة!";
+
+  }
+
+  let botMessage = document.createElement("p");
+  botMessage.textContent = "المساعد: " + reply;
+  messages.appendChild(botMessage);
+
+  input.value = "";
+  messages.scrollTop = messages.scrollHeight;
+}
+
+</script>
+
+</body>
+</html>
