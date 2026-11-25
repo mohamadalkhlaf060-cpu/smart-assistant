@@ -1,208 +1,111 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Assistant</title>
-
 <style>
 *{box-sizing:border-box}
-
-body{
- margin:0;
- font-family:Arial,sans-serif;
- background:#101525;
- color:white;
- display:flex;
- height:100vh;
- overflow:hidden;
-}
-
-.sidebar{
- width:260px;
- background:#171f33;
- padding:20px;
- display:flex;
- flex-direction:column;
-}
-
-.logo{
- font-size:22px;
- color:#91a1ff;
- font-weight:bold;
- margin-bottom:30px;
-}
-
-.newchat{
- background:#657cff;
- border:0;
- padding:14px;
- border-radius:12px;
- color:white;
- cursor:pointer;
- font-size:15px;
-}
-
+body{margin:0;font-family:Arial,sans-serif;background:#101525;color:white;display:flex;height:100vh;overflow:hidden}
+.sidebar{width:260px;background:#171f33;padding:20px;display:flex;flex-direction:column}
+.logo{font-size:22px;color:#91a1ff;font-weight:bold;margin-bottom:30px}
+.newchat{background:#657cff;border:0;padding:14px;border-radius:12px;color:white;cursor:pointer;font-size:15px}
 .sidebar p{color:#aab2c5}
-
-.main{
- flex:1;
- display:flex;
- flex-direction:column;
-}
-
-header{
- padding:20px;
- border-bottom:1px solid #29334b;
- font-size:20px;
- font-weight:bold;
-}
-
-#messages{
- flex:1;
- overflow-y:auto;
- padding:25px;
- max-width:850px;
- width:100%;
- margin:auto;
-}
-
-.message{
- padding:15px 20px;
- border-radius:15px;
- margin:15px 0;
- line-height:1.8;
- max-width:85%;
- overflow-wrap:anywhere;
-}
-
-.user{
- background:#34436b;
- margin-right:auto;
-}
-
-.bot{
- background:#202b46;
- margin-left:auto;
-}
-
-.welcome{
- text-align:center;
- margin-top:100px;
-}
-
-.welcome h1{
- color:#91a1ff;
- font-size:35px;
-}
-
-.input-area{
- padding:20px;
- display:flex;
- gap:10px;
- max-width:850px;
- width:100%;
- margin:auto;
-}
-
-input{
- flex:1;
- background:#202b46;
- border:1px solid #35415e;
- color:white;
- padding:17px;
- border-radius:14px;
- outline:none;
- font-size:16px;
-}
-
-button{
- cursor:pointer;
-}
-
-.send{
- background:#657cff;
- border:0;
- color:white;
- padding:15px 22px;
- border-radius:12px;
-}
-
-@media(max-width:650px){
- .sidebar{width:75px;padding:10px}
- .logo{font-size:12px}
- .newchat{font-size:12px;padding:10px 4px}
- .sidebar p{display:none}
- .welcome h1{font-size:25px}
- #messages{padding:12px}
-}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+header{padding:20px;border-bottom:1px solid #29334b;font-size:20px;font-weight:bold}
+#messages{flex:1;overflow-y:auto;padding:25px;max-width:850px;width:100%;margin:auto}
+.message{padding:15px 20px;border-radius:15px;margin:15px 0;line-height:1.8;max-width:85%;overflow-wrap:anywhere;white-space:pre-wrap}
+.user{background:#34436b;margin-right:auto}
+.bot{background:#202b46;margin-left:auto}
+.welcome{text-align:center;margin-top:100px}
+.welcome h1{color:#91a1ff;font-size:35px}
+.input-area{padding:20px;display:flex;gap:10px;max-width:850px;width:100%;margin:auto}
+input{flex:1;min-width:0;background:#202b46;border:1px solid #35415e;color:white;padding:17px;border-radius:14px;outline:none;font-size:16px}
+button{cursor:pointer}
+.send{background:#657cff;border:0;color:white;padding:15px 22px;border-radius:12px}
+.send:disabled{opacity:.6;cursor:wait}
+@media(max-width:650px){.sidebar{width:75px;padding:10px}.logo{font-size:12px}.newchat{font-size:12px;padding:10px 4px}.sidebar p{display:none}.welcome h1{font-size:25px}#messages{padding:12px}.input-area{padding:12px}.message{max-width:95%}}
 </style>
 </head>
-
 <body>
-
 <aside class="sidebar">
  <div class="logo">🤖 Smart AI</div>
  <button class="newchat" onclick="newChat()">＋ محادثة جديدة</button>
  <p>مساعدك الذكي الشخصي</p>
 </aside>
-
 <main class="main">
-
 <header>Smart Assistant ✨</header>
-
 <div id="messages">
- <div class="welcome" id="welcome">
-  <h1>مرحباً بك ❤️</h1>
-  <p>كيف أستطيع مساعدتك اليوم؟</p>
- </div>
+ <div class="welcome" id="welcome"><h1>مرحباً بك ❤️</h1><p>كيف أستطيع مساعدتك اليوم؟</p></div>
 </div>
-
 <div class="input-area">
- <input id="userInput"
- placeholder="اكتب رسالتك هنا..."
- onkeydown="if(event.key==='Enter')sendMessage()">
- <button class="send" onclick="sendMessage()">إرسال</button>
+ <input id="userInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+ <button class="send" id="sendButton" onclick="sendMessage()">إرسال</button>
 </div>
-
 </main>
-
 <script>
+const conversation = [];
+const input = document.getElementById("userInput");
+const messagesElement = document.getElementById("messages");
+const sendButton = document.getElementById("sendButton");
 
-function sendMessage(){
+input.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
 
- let input=document.getElementById("userInput");
- let messages=document.getElementById("messages");
- let text=input.value.trim();
-
- if(!text)return;
-
- document.getElementById("welcome")?.remove();
-
- let user=document.createElement("div");
- user.className="message user";
- user.textContent=text;
- messages.appendChild(user);
-
- let bot=document.createElement("div");
- bot.className="message bot";
- bot.textContent="مرحباً! أنا Smart Assistant 🤖";
- messages.appendChild(bot);
-
- input.value="";
- messages.scrollTop=messages.scrollHeight;
+function addMessage(role, text) {
+  document.getElementById("welcome")?.remove();
+  const element = document.createElement("div");
+  element.className = "message " + (role === "user" ? "user" : "bot");
+  element.textContent = text;
+  messagesElement.appendChild(element);
+  messagesElement.scrollTop = messagesElement.scrollHeight;
+  return element;
 }
 
-function newChat(){
- document.getElementById("messages").innerHTML=`
- <div class="welcome" id="welcome">
- <h1>مرحباً بك ❤️</h1>
- <p>كيف أستطيع مساعدتك اليوم؟</p>
- </div>`;
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text || sendButton.disabled) return;
+
+  input.value = "";
+  conversation.push({ role: "user", content: text });
+  addMessage("user", text);
+
+  sendButton.disabled = true;
+  sendButton.textContent = "جارٍ التفكير...";
+  const loading = addMessage("assistant", "لحظة من فضلك...");
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: conversation })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "تعذر الاتصال بالمساعد");
+    if (!data.reply) throw new Error("لم يصل رد من المساعد");
+
+    loading.textContent = data.reply;
+    conversation.push({ role: "assistant", content: data.reply });
+  } catch (error) {
+    loading.textContent = "عذراً، حدث خطأ: " + error.message;
+  } finally {
+    sendButton.disabled = false;
+    sendButton.textContent = "إرسال";
+    input.focus();
+    messagesElement.scrollTop = messagesElement.scrollHeight;
+  }
 }
 
+function newChat() {
+  conversation.length = 0;
+  messagesElement.innerHTML = '<div class="welcome" id="welcome"><h1>مرحباً بك ❤️</h1><p>كيف أستطيع مساعدتك اليوم؟</p></div>';
+  input.focus();
+}
 </script>
-
 </body>
 </html>
